@@ -4,13 +4,10 @@ MAINTAINER jemlifathi
 # Update and Install Git and Maven and ftp-upload
 RUN apt-get update && apt-get --assume-yes install -y zip unzip apt-utils wget git maven jq
 
-# Download sonar scanner
+# Download sonar scanner: optional, you can use gradle sonarqube plugin in stead
 RUN cd /opt && wget https://sonarsource.bintray.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-3.0.3.778-linux.zip && unzip sonar-scanner-cli-3.0.3.778-linux.zip
 # Add sonar scanner to PATH
 ENV PATH ${PATH}:/opt/sonar-scanner-3.0.3.778-linux/bin
-
-# Update settings.xml Maven config file
-COPY ./settings.xml /usr/share/maven/conf/settings.xml
 
 # Install Deps
 RUN dpkg --add-architecture i386 && apt-get update && apt-get install -y --force-yes expect git wget libc6-i386 lib32stdc++6 lib32gcc1 lib32ncurses5 lib32z1 python curl libqt5widgets5 && apt-get clean && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -36,6 +33,12 @@ ENV PATH ${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
 
 RUN which adb
 RUN which android
+
+# Install SDK Man
+RUN curl -s "https://get.sdkman.io" | bash && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+# Install Gradle
+RUN sdk install gradle
 
 # Cleaning
 RUN apt-get clean
