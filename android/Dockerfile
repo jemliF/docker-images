@@ -34,11 +34,15 @@ ENV PATH ${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
 RUN which adb
 RUN which android
 
-# Install SDK Man
-RUN curl -s "https://get.sdkman.io" | bash && source "$HOME/.sdkman/bin/sdkman-init.sh"
-
 # Install Gradle
-RUN sdk install gradle
+#RUN sdk install gradle
+
+RUN wget https://downloads.gradle.org/distributions/gradle-4.5.1-bin.zip
+RUN ls -al
+RUN mkdir /opt/gradle && unzip -d /opt/gradle gradle-4.5.1-bin.zip
+ENV GRADLE_HOME /opt/gradle/gradle-4.5.1
+ENV PATH ${PATH}:${GRADLE_HOME}/bin
+RUN gradle -v
 
 # Cleaning
 RUN apt-get clean
