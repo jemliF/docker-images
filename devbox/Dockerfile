@@ -2,15 +2,24 @@ FROM java:8
 MAINTAINER fathi.jemli@proxym-it.com
 
 # Update and Install Git and Maven and ftp-upload
-RUN apt-get update && apt-get --assume-yes install -y zip unzip apt-utils wget git maven jq
+RUN apt-get update && apt-get --assume-yes install --no-install-recommends -y zip unzip apt-utils wget git maven lftp ftp-upload jq figlet && rm -rf /var/lib/apt/lists/*
 
-# Download sonar scanner: optional, you can use gradle sonarqube plugin in stead
-RUN cd /opt && wget https://sonarsource.bintray.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-3.0.3.778-linux.zip && unzip sonar-scanner-cli-3.0.3.778-linux.zip
+# Install node 6
+RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - && apt-get install --no-install-recommends -y nodejs
+
+# Install cordova, mfpdevcli and angular-cli
+RUN npm i -g mfpdev-cli && npm i -g cordova@6.4.0 && npm i -g @angular/cli
+
+# Download sonar scanner
+RUN cd /opt && wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-3.2.0.1227-linux.zip && unzip sonar-scanner-cli-3.2.0.1227-linux.zip
 # Add sonar scanner to PATH
-ENV PATH ${PATH}:/opt/sonar-scanner-3.0.3.778-linux/bin
+ENV PATH ${PATH}:/opt/sonar-scanner-cli-3.2.0.1227-linux/bin
+
+# Update settings.xml Maven config file
+COPY ./settings.xml /usr/share/maven/conf/settings.xml
 
 # Install Deps
-RUN dpkg --add-architecture i386 && apt-get update && apt-get install -y --force-yes expect git wget libc6-i386 lib32stdc++6 lib32gcc1 lib32ncurses5 lib32z1 python curl libqt5widgets5 && apt-get clean && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN dpkg --add-architecture i386 && apt-get update && apt-get install --no-install-recommends -y --force-yes expect git wget libc6-i386 lib32stdc++6 lib32gcc1 lib32ncurses5 lib32z1 python curl libqt5widgets5 && apt-get clean && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/* && rm -rf /var/lib/apt/lists/*
 
 
 # Install Android
@@ -36,7 +45,6 @@ RUN which android
 
 # Install Gradle
 RUN wget https://downloads.gradle.org/distributions/gradle-4.5.1-bin.zip
-RUN ls -al
 RUN mkdir /opt/gradle && unzip -d /opt/gradle gradle-4.5.1-bin.zip
 ENV GRADLE_HOME /opt/gradle/gradle-4.5.1
 ENV PATH ${PATH}:${GRADLE_HOME}/bin

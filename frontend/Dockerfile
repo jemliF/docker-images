@@ -1,9 +1,8 @@
 FROM node:8-alpine
+MAINTAINER fathi.jemli@proxym-it.com
 
 # Update and Install Git and Maven and ftp-upload
-RUN apk update && apk --update-cache --allow-untrusted add zip unzip wget git maven jq yarn
-
-RUN unzip
+RUN apk update && apk --update --allow-untrusted add zip unzip wget git maven jq yarn && rm -rf /var/cache/apk/*
 
 # Download sonar scanner
 RUN wget https://sonarsource.bintray.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-3.0.3.778-linux.zip && unzip sonar-scanner-cli-3.0.3.778-linux.zip
